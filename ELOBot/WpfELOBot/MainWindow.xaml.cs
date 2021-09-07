@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,12 +51,7 @@ namespace WpfELOBot
 
             //  You can assign your bot token to a string, and pass that in to connect.
             //  This is, however, insecure, particularly if you plan to have your code hosted in a public repository.
-            var token = "ODg0NzA0NjYzMzAyMjA5NTY2.YTcXbA.2WAjKLN4w6sFV31AJQ1V3qkuDNI";
-
-            // Some alternative options would be to keep your token in an Environment Variable or a standalone file.
-            // var token = Environment.GetEnvironmentVariable("NameOfYourEnvironmentVariable");
-            // var token = File.ReadAllText("token.txt");
-            // var token = JsonConvert.DeserializeObject<AConfigurationClass>(File.ReadAllText("config.json")).Token;
+            var token = File.ReadAllText("token.txt");
 
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
