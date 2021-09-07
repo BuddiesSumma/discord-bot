@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Discord;
+using Discord.WebSocket;
 
 namespace WpfELOBot
 {
@@ -20,9 +22,77 @@ namespace WpfELOBot
     /// </summary>
     public partial class MainWindow : Window
     {
+        private DiscordSocketClient _client;
+
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private async void BtnStart_Click(object sender, RoutedEventArgs e)
+        {
+            await MainAsync();
+        }
+
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            if (_client != null)
+            {
+                _client.LogoutAsync();
+                _client.StopAsync();
+            }
+        }
+
+        public async Task MainAsync()
+        {
+            _client = new DiscordSocketClient();
+            _client.MessageReceived += CommandHandler;
+
+            //  You can assign your bot token to a string, and pass that in to connect.
+            //  This is, however, insecure, particularly if you plan to have your code hosted in a public repository.
+            var token = "ODg0NzA0NjYzMzAyMjA5NTY2.YTcXbA.2WAjKLN4w6sFV31AJQ1V3qkuDNI";
+
+            // Some alternative options would be to keep your token in an Environment Variable or a standalone file.
+            // var token = Environment.GetEnvironmentVariable("NameOfYourEnvironmentVariable");
+            // var token = File.ReadAllText("token.txt");
+            // var token = JsonConvert.DeserializeObject<AConfigurationClass>(File.ReadAllText("config.json")).Token;
+
+            await _client.LoginAsync(TokenType.Bot, token);
+            await _client.StartAsync();
+
+            // Block this task until the program is closed.
+            await Task.Delay(-1);
+        }
+
+        public Task CommandHandler(SocketMessage message)
+        {
+            string command = "";
+
+            //Als bericht niet begint met vraagteken
+            if (!message.Content.StartsWith("!"))
+            {
+                //Laat weten dat task gedaan is (doe niets)
+                return Task.CompletedTask;
+            }
+            //Als auteur van bericht een bot is
+            if(message.Author.IsBot)
+            {
+                //Laat weten dat task gedaan is (reageer niet op andere bots)
+                return Task.CompletedTask;
+            }
+
+            //Haal vraagteken af van de message en zet het in variabele command
+            command = message.Content.Substring(1, message.Content.Length - 1);
+
+            //Als command gelijk is aan test
+            if(command.Equals("test"))
+            {
+                //Stuur bericht
+                message.Channel.SendMessageAsync("It works!");
+            }
+
+            //Geef terug dat task klaar is
+            return Task.CompletedTask;
         }
     }
 }
